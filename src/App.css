@@ -1,38 +1,51 @@
-.App {
-  text-align: center;
+#root {
+    min-height: 100vh;
+    background-color: white;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.note {
+    max-height: 41vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 0.5px solid rgb(180, 167, 167);
+    box-shadow: 0 0 0 1px rgba(255, 213, 213, 0.5);
+    border-radius: 5em;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.note p {
+    margin: 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.text-area[contenteditable]:empty::after {
+    content: "Create note";
+    color: gray;
 }
 
-.App-link {
-  color: #61dafb;
+.text-area[contenteditable]:focus,
+input:focus {
+    outline: none !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.form-control:focus {
+    box-shadow: none !important;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
