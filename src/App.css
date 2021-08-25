@@ -1,19 +1,44 @@
+body {
+    background-color: rgb(250, 248, 248);
+}
+
 #root {
     min-height: 100vh;
-    background-color: white;
 }
 
 .note {
-    max-height: 41vh;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    background-color: white;
     border: 0.5px solid rgb(180, 167, 167);
     box-shadow: 0 0 0 1px rgba(255, 213, 213, 0.5);
-    border-radius: 5em;
+}
+
+.note .content {
+    max-height: 38vh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.note-footer {
+    height: 4vh;
+}
+
+.note-footer .tool {
+    display: none;
+}
+
+.note:hover .note-footer .tool {
+    display: block;
 }
 
 .note p {
     margin: 0;
+}
+
+form.form-note input {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+form.form-note span[role="textbox"] {
+    font-size: 0.8em;
 }
 
 .text-area[contenteditable]:empty::after {
@@ -28,6 +53,12 @@ input:focus {
 
 .form-control:focus {
     box-shadow: none !important;
+}
+
+div#toast-container {
+    position: fixed;
+    bottom: 6vh;
+    left: 4vw;
 }
 
 /* width */

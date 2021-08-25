@@ -1,93 +1,112 @@
 // import library
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 // import component
-import NoteBlock from "./components/NoteBlock";
+
 import FormNote from "./components/FormNote";
+import NoteModal from "./components/NoteModal";
+import BoardNote from "./components/BoardNote";
+import BoardToast from "./components/BoardToast";
+// list note test
+let listNote = require("./NoteList.json");
 
-var listNote = [
-    {
-        title: "Note number 1",
-        content:
-            "Note number 1Note number 1Note number 1Note number 1Note number 1Note number 1\nNote number 1",
-    },
-    {
-        title: "Note number 2",
-        content:
-            "Note number 2Note number 2Note number 2Note number 2Note number 2Note number",
-    },
-    {
-        title: "Note number 3",
-        content:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    },
-    {
-        title: "Note number 4",
-        content:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pellentesque massa placerat duis ultricies. Eget lorem dolor sed viverra ipsum. Augue mauris augue neque gravida in fermentum et. Facilisis leo vel fringilla est ullamcorper eget nulla. Ut tellus elementum sagittis vitae et leo duis ut diam. Lectus mauris ultrices eros in cursus turpis massa tincidunt. Gravida in fermentum et sollicitudin ac orci phasellus egestas tellu",
-    },
-    {
-        title: "Note number 5",
-        content:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pellentesque massa placerat duis ultricies. Eget lorem dolor sed viverra ipsum. Augue mauris augue neque gravida in fermentum et. Facilisis leo vel fringilla est ullamcorper eget nulla. Ut tellus elementum sagittis vitae et leo duis ut diam. Lectus mauris ultrices eros in cursus turpis massa tincidunt.",
-    },
-    {
-        title: "Note number 6",
-        content:
-            "quet bibendum enim facilisis gravida. Semper risus in hendrerit gravida rutrum quisque. Urna molestie at elementum eu facilisis sed odio morbi. Sit amet est placerat in egestas erat imperdiet. Rhoncus est pellentesque elit ullamcorper dignissim cras tincidunt. Lorem ipsum dolor sit amet. Et leo duis ut diam quam nulla porttitor massa.",
-    },
-    {
-        title: "Note number 7",
-        content:
-            "pellentesque \n elit ullamcorper \n dignissim cras tincidunt.",
-    },
-];
+let noteForModal;
 
+// There are state of others components
+let stateOfBoardNote;
+const getStateOfBoardNote = (state) => (stateOfBoardNote = state);
+
+let stateOfModalNote;
+const getStateOfModalNote = (state) => (stateOfModalNote = state);
+
+let putNewToast;
+const getFromBoardToast = (input) => (putNewToast = input);
+
+const createUndoCall = (note, i) => (func) => {
+    console.log("undocall");
+    listNote.splice(i, 0, note);
+    func();
+    stateOfBoardNote();
+};
 function App() {
-    // State detect list note has changed
-    const [listChange, setListChange] = useState(true);
-
     // Sort note into for cols
-    function generateCols() {
-        let cols = [[], [], [], []];
-        listNote.forEach((value, index) => {
-            cols[index % 4].push(<NoteBlock key={index} {...value} />);
-        });
-        return cols;
-    }
+
+    // Delete the note
+    const deleteNote = (index) => {
+        return listNote.splice(index, 1);
+    };
+
+    // Handler note onClick
+    const noteBlockClick = (index) => {
+        return (e) => {
+            let tagName = e.target.tagName;
+            // console.log(tagName);
+            if (
+                tagName === "BUTTON" ||
+                tagName === "svg" ||
+                tagName === "path"
+            ) {
+                console.log("Event delete");
+                let note = deleteNote(index)[0];
+                let func = createUndoCall(note, index);
+                putNewToast(func);
+                stateOfBoardNote();
+                return;
+            }
+            noteForModal = listNote[index];
+            stateOfModalNote(true, noteForModal);
+        };
+    };
 
     // Handler add new notes to the list
     const addNote = (e) => {
         e.preventDefault();
         let title = document.getElementById("inputTitle").value;
         let content = document.getElementById("inputContent").innerText;
-        console.log(content);
+
         if (title && content) {
-            listNote.push({
+            listNote.unshift({
                 title: title,
                 content: content,
             });
-            setListChange(!listChange);
+            stateOfBoardNote();
         }
+    };
+    // Update note
+    const updateNote = (e) => {
+        let form = e.target.form;
+        let title = form.children[0].children[0].value;
+        let content = form.children[1].children[0].innerText;
+
+        noteForModal.title = title;
+        noteForModal.content = content;
+
+        stateOfModalNote(false);
+        stateOfBoardNote();
     };
 
     return (
-        <Container>
-            <Row className="justify-content-center my-5">
-                <Col md={9}>
-                    <FormNote addNote={addNote} />
-                </Col>
-            </Row>
+        <>
+            <Container>
+                <FormNote buttonHandler={addNote} id={"formAddNote"} />
 
-            <Row>
-                {generateCols().map((value, index) => {
-                    return <Col key={index}>{value}</Col>;
-                })}
-            </Row>
-        </Container>
+                <BoardNote
+                    listNote={listNote}
+                    onClickNote={noteBlockClick}
+                    getState={getStateOfBoardNote}
+                />
+            </Container>
+
+            <NoteModal
+                buttonHandler={updateNote}
+                getState={getStateOfModalNote}
+            ></NoteModal>
+
+            <BoardToast get={getFromBoardToast} />
+        </>
     );
 }
 
