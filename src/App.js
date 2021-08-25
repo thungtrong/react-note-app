@@ -1,8 +1,12 @@
+// import library
 import React, { useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
+
+// import component
 import NoteBlock from "./components/NoteBlock";
+import FormNote from "./components/FormNote";
 
 var listNote = [
     {
@@ -43,8 +47,10 @@ var listNote = [
 ];
 
 function App() {
+    // State detect list note has changed
     const [listChange, setListChange] = useState(true);
 
+    // Sort note into for cols
     function generateCols() {
         let cols = [[], [], [], []];
         listNote.forEach((value, index) => {
@@ -53,6 +59,7 @@ function App() {
         return cols;
     }
 
+    // Handler add new notes to the list
     const addNote = (e) => {
         e.preventDefault();
         let title = document.getElementById("inputTitle").value;
@@ -71,45 +78,7 @@ function App() {
         <Container>
             <Row className="justify-content-center my-5">
                 <Col md={9}>
-                    <Form
-                        id="formAddNote"
-                        className="border border-1 rounded-3 p-2"
-                    >
-                        <Form.Group controlId="inputTitle">
-                            <Form.Control
-                                className="border-0"
-                                type="text"
-                                placeholder="Title"
-                                onKeyPress={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        document
-                                            .getElementById("inputContent")
-                                            .focus();
-                                    }
-                                }}
-                            ></Form.Control>
-                        </Form.Group>
-
-                        <Form.Group controlId="inputContent" className="my-2">
-                            <Form.Control
-                                as="span"
-                                className="text-area border-0"
-                                role="textbox"
-                                placeholder="Create Note"
-                                contentEditable
-                            ></Form.Control>
-                        </Form.Group>
-                        <Form.Group className="d-flex justify-content-end">
-                            <Button
-                                variant="outline-secondary"
-                                size="sm"
-                                onClick={addNote}
-                            >
-                                Add
-                            </Button>
-                        </Form.Group>
-                    </Form>
+                    <FormNote addNote={addNote} />
                 </Col>
             </Row>
 
