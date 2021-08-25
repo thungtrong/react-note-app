@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import NoteBlocks from "./components/NoteBlocks";
+import NoteBlock from "./components/NoteBlock";
 
 var listNote = [
     {
@@ -45,12 +45,12 @@ var listNote = [
 function App() {
     const [listChange, setListChange] = useState(true);
 
-    function divide() {
-        let arrIndex = [[], [], [], []];
+    function generateCols() {
+        let cols = [[], [], [], []];
         listNote.forEach((value, index) => {
-            arrIndex[index % 4].push(index);
+            cols[index % 4].push(<NoteBlock key={index} {...value} />);
         });
-        return arrIndex;
+        return cols;
     }
 
     const addNote = (e) => {
@@ -114,12 +114,8 @@ function App() {
             </Row>
 
             <Row>
-                {divide().map((value, index) => {
-                    return (
-                        <Col key={index}>
-                            <NoteBlocks allNote={listNote} usedNotes={value} />
-                        </Col>
-                    );
+                {generateCols().map((value, index) => {
+                    return <Col key={index}>{value}</Col>;
                 })}
             </Row>
         </Container>
