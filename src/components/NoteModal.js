@@ -1,22 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Modal } from "react-bootstrap";
 import FormNote from "./FormNote";
 
-let note;
-
 function NoteModal(props) {
-    console.log("NoteModal");
-    const [show, setShow] = useState(false);
+    // console.log("NoteModal");
+    const { buttonHandler, note, ...modalProps } = { ...props };
 
-    const { buttonHandler, getState, ...modalProps } = { ...props };
-    getState((state, newNote) => {
-        note = newNote;
-        setShow(state);
-    });
     return (
         <Modal
-            show={show}
             {...modalProps}
             size="md"
             fullscreen="sm-down"

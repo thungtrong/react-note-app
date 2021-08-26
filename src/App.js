@@ -1,38 +1,57 @@
 // import library
-// import React, { useState } from "react";
+import React, {
+    useState,
+    //useMemo,
+    useCallback,
+    // useEffect,
+} from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container } from "react-bootstrap";
 
 // import component
-
 import FormNote from "./components/FormNote";
 import NoteModal from "./components/NoteModal";
 import BoardNote from "./components/BoardNote";
 import BoardToast from "./components/BoardToast";
+
+// Using memo - create memo
+const MemoBoardNote = React.memo(BoardNote);
+const MemoNoteModal = React.memo(NoteModal);
+const MemoFormNote = React.memo(FormNote);
+const MemoBoardToast = React.memo(BoardToast);
 // list note test
 let listNote = require("./NoteList.json");
 
 let noteForModal;
+let indexNoteForModal;
 
 // There are state of others components
-let stateOfBoardNote;
-const getStateOfBoardNote = (state) => (stateOfBoardNote = state);
-
-let stateOfModalNote;
-const getStateOfModalNote = (state) => (stateOfModalNote = state);
-
 let putNewToast;
 const getFromBoardToast = (input) => (putNewToast = input);
 
-const createUndoCall = (note, i) => (func) => {
-    console.log("undocall");
+const createUndoCall = (note, i, stateOfBoardNote) => (func) => {
+    // console.log("undocall");
     listNote.splice(i, 0, note);
     func();
     stateOfBoardNote();
 };
+
 function App() {
-    // Sort note into for cols
+    // State -- Khi state change App sẽ render lại
+    // -> Các sub component render theo
+    // -> Không tối ưu
+    // -> Cần thực hiện chỉ render component changed
+    //      - Cách 1: Redux hoặc kéo state của sub component về App (previous version)
+    //      - Cách 2: memo, useMemo - chỉ thực hiện tính toán lại khi có sự thay đổi
+    const [listChange, setListChange] = useState([0]);
+    const stateOfBoardNote = (i) => {
+        // Do mỗi lần tạo một mảng rỗng sẽ có địa chỉ khác nhau
+        setListChange([i]);
+    };
+
+    const [showModal, setShowModal] = useState(false);
+    const stateOfModalNote = (show) => setShowModal(show);
 
     // Delete the note
     const deleteNote = (index) => {
@@ -40,7 +59,7 @@ function App() {
     };
 
     // Handler note onClick
-    const noteBlockClick = (index) => {
+    const noteBlockClick = useCallback((index) => {
         return (e) => {
             let tagName = e.target.tagName;
             // console.log(tagName);
@@ -49,20 +68,22 @@ function App() {
                 tagName === "svg" ||
                 tagName === "path"
             ) {
-                console.log("Event delete");
+                // console.log("Delete evenet", listChange);
                 let note = deleteNote(index)[0];
-                let func = createUndoCall(note, index);
-                putNewToast(func);
-                stateOfBoardNote();
+                let undo = createUndoCall(note, index, stateOfBoardNote);
+                putNewToast(undo);
+                stateOfBoardNote(index);
+                // console.log("Delete evenet", listChange);
                 return;
             }
             noteForModal = listNote[index];
-            stateOfModalNote(true, noteForModal);
+            indexNoteForModal = index;
+            stateOfModalNote(true);
         };
-    };
+    }, []);
 
     // Handler add new notes to the list
-    const addNote = (e) => {
+    const addNote = useCallback((e) => {
         e.preventDefault();
         let title = document.getElementById("inputTitle").value;
         let content = document.getElementById("inputContent").innerText;
@@ -74,7 +95,7 @@ function App() {
             });
             stateOfBoardNote();
         }
-    };
+    }, []);
     // Update note
     const updateNote = (e) => {
         let form = e.target.form;
@@ -85,27 +106,27 @@ function App() {
         noteForModal.content = content;
 
         stateOfModalNote(false);
-        stateOfBoardNote();
+        stateOfBoardNote(indexNoteForModal);
     };
 
     return (
         <>
             <Container>
-                <FormNote buttonHandler={addNote} id={"formAddNote"} />
+                <MemoFormNote buttonHandler={addNote} id={"formAddNote"} />
 
-                <BoardNote
+                <MemoBoardNote
                     listNote={listNote}
+                    change={listChange}
                     onClickNote={noteBlockClick}
-                    getState={getStateOfBoardNote}
                 />
             </Container>
 
-            <NoteModal
+            <MemoNoteModal
                 buttonHandler={updateNote}
-                getState={getStateOfModalNote}
-            ></NoteModal>
-
-            <BoardToast get={getFromBoardToast} />
+                note={noteForModal}
+                show={showModal}
+            />
+            <MemoBoardToast get={getFromBoardToast} />
         </>
     );
 }

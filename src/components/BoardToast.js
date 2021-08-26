@@ -6,10 +6,10 @@ import ToastUndo from "./ToastUndo";
 let arrToast = [];
 
 function BoardToast({ get }) {
-    console.log("BoardToast");
+    // console.log("BoardToast");
 
     const [show, setShow] = useState(0);
-    const check = () => {
+    const checkAndCloseContainer = () => {
         arrToast.shift();
         setShow(arrToast.length);
     };
@@ -17,7 +17,11 @@ function BoardToast({ get }) {
     get((undoCall) => {
         let key = Math.random();
         arrToast.push(
-            <ToastUndo undo={undoCall} key={key} closeContainer={check} />
+            <ToastUndo
+                undo={undoCall}
+                key={key}
+                closeContainer={checkAndCloseContainer}
+            />
         );
         setShow(key);
     });

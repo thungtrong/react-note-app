@@ -1,25 +1,24 @@
 import { Col, Row } from "react-bootstrap";
-import { useState } from "react";
+import React from "react";
 import NoteBlock from "./NoteBlock";
 
-function BoardNote({ listNote, onClickNote, getState }) {
-    const [reload, setReload] = useState(false);
-    const changeState = () => setReload(!reload);
+function BoardNote({ listNote, onClickNote, change }) {
+    // console.log("BoardNote");
 
-    getState(changeState);
-
-    console.log("BoardNote");
     const generateCols = () => {
         let cols = [[], [], [], []];
         if (listNote.length > 0) {
+            let i = 0;
             listNote.forEach((value, index) => {
-                cols[index % 4].push(
-                    <NoteBlock
-                        key={index}
-                        {...value}
-                        onClick={onClickNote(index)}
-                    />
-                );
+                if (value) {
+                    cols[i++ % 4].push(
+                        <NoteBlock
+                            key={index}
+                            {...value}
+                            onClick={onClickNote(index)}
+                        />
+                    );
+                }
             });
 
             let columns = [];

@@ -1,7 +1,7 @@
 import { Form, Button, Row, Col } from "react-bootstrap";
 
 function FormNote({ buttonHandler, id, note }) {
-    console.log("FormNote");
+    // console.log("FormNote");
     // Replace key Enter event
     const inputTitleKeyPressHandler = (e) => {
         if (e.key === "Enter") {

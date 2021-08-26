@@ -10,9 +10,9 @@ function ToastUndo({ undo, closeContainer }) {
             onClose={() => {
                 // close container when don't have children
                 closeContainer();
-                // Xoa trong database
+                setShow(false);
             }}
-            delay={4000}
+            delay={10000}
             autohide
         >
             <Toast.Body className="text-white position-relative rounded-5">
